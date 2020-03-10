@@ -10,7 +10,7 @@ GitLabApi.install = (Vue, options) => {
     const response = await axios.get(path, {
       baseURL: Config.root.gitlabApi,
       params,
-      headers: { 'Private-Token': Config.root.privateToken }
+      headers: { 'Private-Token': Config.root.privateToken, 'encoding': 'text/plain' }
     })
     const result = response.data
     if (behaviour.follow_next_page_links) {
@@ -18,7 +18,7 @@ GitLabApi.install = (Vue, options) => {
       let parsedLinks = parse(response.headers.link)
       while (parsedLinks && parsedLinks.next) {
         const nextResponse = await axios.get(parsedLinks.next.url, {
-          headers: { 'Private-Token': Config.root.privateToken }
+          headers: { 'Private-Token': Config.root.privateToken, 'encoding': 'text/plain'  }
         })
         result.push(...nextResponse.data)
         parsedLinks = parse(nextResponse.headers.link)
