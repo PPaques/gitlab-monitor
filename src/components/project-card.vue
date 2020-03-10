@@ -196,11 +196,12 @@
         const showMerged = this.showMerged
         const showTags = this.showTags
         const fetchCount = Config.root.fetchCount
-
+        const dateNow = Date.now()
         const branches = await this.$api(`/projects/${this.projectId}/repository/branches`, {
           per_page: fetchCount > 100 ? 100 : fetchCount
         }, { follow_next_page_links: fetchCount > 100 })
         const branchNames = branches.filter(branch => showMerged ? true : !branch.merged)
+          .filter(branchName => { return dateNow - new Date(branchName.commit.committed_date).getTime() < maxAge * 3600000})
           .sort((a, b) => new Date(b.commit.committed_date).getTime() - new Date(a.commit.committed_date).getTime()).reverse()
           .map(branch => branch.name)
           .filter(branchName => {
@@ -212,6 +213,7 @@
           tags = await this.$api(`/projects/${this.projectId}/repository/tags`, {
             per_page: fetchCount > 100 ? 100 : fetchCount
           }, { follow_next_page_links: fetchCount > 100 })
+          tags = tags.filter(tag => { return dateNow - new Date(tag.commit.committed_date).getTime() < maxAge * 3600000})
         }
         const tagNames = tags.map((tag) => tag.name)
         const newPipelines = {}
